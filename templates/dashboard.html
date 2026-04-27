@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Панель управления — МедДок{% endblock %}
+{% block page_title %}Панель управления{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="icon">👥</span>
+    <div class="value">{{ patients|length }}</div>
+    <div class="label">Пациентов в базе</div>
+  </div>
+  <div class="stat-card">
+    <span class="icon">📋</span>
+    <div class="value">{{ appointments|length }}</div>
+    <div class="label">Записей на приём</div>
+  </div>
+  <div class="stat-card">
+    <span class="icon">🏥</span>
+    <div class="value">{{ total_emk }}</div>
+    <div class="label">Записей в ЭМК</div>
+  </div>
+  <div class="stat-card">
+    <span class="icon">👨‍⚕️</span>
+    <div class="value">{{ doctors|length }}</div>
+    <div class="label">Врачей в системе</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+  <!-- Последние записи -->
+  <div class="card">
+    <div class="card-header">
+      📋 Последние записи на приём
+      <a href="{{ url_for('appointments.new') }}" class="btn btn-primary btn-sm">+ Новая</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Пациент</th><th>Врач</th><th>Время</th></tr></thead>
+        <tbody>
+        {% for a in appointments[-5:]|reverse %}
+          <tr>
+            <td>{{ a.patient_fio }}</td>
+            <td>{{ a.doctor_name }}</td>
+            <td><span class="badge badge-blue">{{ a.slot }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" style="color:var(--text-muted);text-align:center">Нет записей</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Нагрузка врачей -->
+  <div class="card">
+    <div class="card-header">📊 Нагрузка врачей</div>
+    <div class="card-body">
+    {% if doctor_load %}
+      {% for doc, count in doctor_load.items() %}
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span>{{ doc }}</span>
+          <span style="color:var(--text-muted)">{{ count }} записей</span>
+        </div>
+        {% set max_val = doctor_load.values()|max %}
+        <div style="height:6px;background:var(--border);border-radius:3px">
+          <div style="height:6px;background:var(--primary);border-radius:3px;
+                      width:{{ (count / max_val * 100)|int }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:var(--text-muted);font-size:13px">Нет данных</p>
+    {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

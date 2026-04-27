@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}ЭМК — {{ patient.fio }}{% endblock %}
+{% block page_title %}ЭМК: {{ patient.fio }}{% endblock %}
+{% block topbar_actions %}
+  <a href="{{ url_for('patients.index') }}" class="btn btn-ghost">← К пациентам</a>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+
+  <!-- История болезни -->
+  <div class="card">
+    <div class="card-header">🏥 История болезни</div>
+    <div class="card-body">
+      {% if patient.emk %}
+      <ul class="timeline">
+        {% for e in patient.emk|reverse %}
+        <li>
+          <div class="diag">{{ e.diagnosis }}</div>
+          <div class="date">{{ e.date }}</div>
+          <div class="note">{{ e.notes }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p style="color:var(--text-muted)">Записей нет</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Боковая панель: инфо + добавление -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <div class="card">
+      <div class="card-header">👤 Данные пациента</div>
+      <div class="card-body" style="font-size:13px;display:flex;flex-direction:column;gap:8px">
+        <div><span style="color:var(--text-muted)">Дата рождения:</span> {{ patient.birth_date or '—' }}</div>
+        <div><span style="color:var(--text-muted)">Адрес:</span> {{ patient.address or '—' }}</div>
+        <div><span style="color:var(--text-muted)">Полис:</span> {{ patient.polis or '—' }}</div>
+        <div><span style="color:var(--text-muted)">СНИЛС:</span> {{ patient.snils or '—' }}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">➕ Новая запись</div>
+      <div class="card-body">
+        <form method="post">
+          <div class="form-group">
+            <label>Код МКБ-10 <span style="color:var(--danger)">*</span></label>
+            <input name="diagnosis" placeholder="Например: J06.9" required>
+            <div class="form-hint">⚠ Дефект ТЗ: валидация кода отсутствует</div>
+          </div>
+          <div class="form-group">
+            <label>Примечание / назначение</label>
+            <textarea name="notes" rows="3"
+                      placeholder="Описание, назначенное лечение…"></textarea>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center">
+            Добавить запись
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

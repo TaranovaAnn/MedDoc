@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}МИС «МедДок»{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>🏥 МедДок</h1>
+      <small>Медицинская информационная система</small>
+    </div>
+    <div class="sidebar-user">
+      <div>{{ session.user }}</div>
+      <span class="role">{{ session.role }}</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('main.index') }}"
+         class="{{ 'active' if request.endpoint == 'main.index' }}">
+        <span class="icon">📊</span> Панель управления
+      </a>
+      {% if session.role in ['Врач', 'Регистратор', 'Администратор'] %}
+      <a href="{{ url_for('patients.index') }}"
+         class="{{ 'active' if 'patients' in request.endpoint }}">
+        <span class="icon">👥</span> Пациенты
+      </a>
+      {% endif %}
+      {% if session.role in ['Врач', 'Регистратор', 'Администратор'] %}
+      <a href="{{ url_for('appointments.index') }}"
+         class="{{ 'active' if 'appointments' in request.endpoint }}">
+        <span class="icon">📋</span> Записи на приём
+      </a>
+      <a href="{{ url_for('schedule.index') }}"
+         class="{{ 'active' if 'schedule' in request.endpoint }}">
+        <span class="icon">📅</span> Расписание
+      </a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{{ url_for('auth.logout') }}">🚪 Выйти из системы</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2>{% block page_title %}{% endblock %}</h2>
+      <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+    </div>
+    <div class="content">
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="alerts">
+        {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">
+          {{ '✓' if cat == 'success' else '✗' if cat == 'error' else '⚠' }} {{ msg }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

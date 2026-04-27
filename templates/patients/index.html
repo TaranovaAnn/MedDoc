@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Пациенты — МедДок{% endblock %}
+{% block page_title %}Пациенты{% endblock %}
+{% block topbar_actions %}
+  <a href="{{ url_for('patients.new') }}" class="btn btn-primary">➕ Новый пациент</a>
+{% endblock %}
+
+{% block content %}
+<form class="search-bar" method="get">
+  <input name="q" value="{{ query }}" placeholder="Поиск по ФИО…">
+  <button class="btn btn-ghost" type="submit">🔍 Найти</button>
+  {% if query %}<a href="{{ url_for('patients.index') }}" class="btn btn-ghost">✖ Сбросить</a>{% endif %}
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ФИО</th>
+          <th>Дата рождения</th>
+          <th>Полис ОМС</th>
+          <th>СНИЛС</th>
+          <th>Записей ЭМК</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for p in patients %}
+        <tr>
+          <td><strong>{{ p.fio }}</strong></td>
+          <td>{{ p.birth_date or '—' }}</td>
+          <td><code style="font-size:12px">{{ p.polis or '—' }}</code></td>
+          <td>{{ p.snils or '—' }}</td>
+          <td>
+            <a href="{{ url_for('patients.emk', fio=p.fio) }}">
+              <span class="badge badge-{{ 'blue' if p.emk else 'gray' }}">
+                {{ p.emk|length }} зап.
+              </span>
+            </a>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="{{ url_for('patients.emk', fio=p.fio) }}"
+                 class="btn btn-ghost btn-sm">🏥 ЭМК</a>
+              <a href="{{ url_for('patients.edit', fio=p.fio) }}"
+                 class="btn btn-ghost btn-sm">✏️ Ред.</a>
+              <form method="post"
+                    action="{{ url_for('patients.delete', fio=p.fio) }}"
+                    onsubmit="return confirm('Удалить пациента «{{ p.fio }}»?')">
+                <button class="btn btn-danger btn-sm">🗑</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">
+            {% if query %}Пациенты не найдены{% else %}Нет пациентов в базе{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Редактирование' if patient else 'Новый пациент' }} — МедДок{% endblock %}
+{% block page_title %}{{ 'Редактирование пациента' if patient else 'Новый пациент' }}{% endblock %}
+{% block topbar_actions %}
+  <a href="{{ url_for('patients.index') }}" class="btn btn-ghost">← Назад</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:600px">
+  <div class="card-header">
+    {{ '✏️ Редактировать данные' if patient else '➕ Регистрация пациента' }}
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% if not patient %}
+      <div class="form-group">
+        <label>ФИО <span style="color:var(--danger)">*</span></label>
+        <input name="fio" placeholder="Фамилия Имя Отчество" required>
+      </div>
+      {% endif %}
+      <div class="form-row">
+        <div class="form-group">
+          <label>Дата рождения</label>
+          <input name="birth_date" placeholder="ДД.ММ.ГГГГ"
+                 value="{{ patient.birth_date if patient }}">
+          <div class="form-hint">⚠ Дефект ТЗ: формат не валидируется</div>
+        </div>
+        <div class="form-group">
+          <label>Полис ОМС</label>
+          <input name="polis" placeholder="16 цифр"
+                 value="{{ patient.polis if patient }}">
+          <div class="form-hint">⚠ Дефект ТЗ: формат не задан</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Адрес</label>
+        <input name="address" placeholder="г. Москва, ул. …"
+               value="{{ patient.address if patient }}">
+      </div>
+      <div class="form-group">
+        <label>СНИЛС</label>
+        <input name="snils" placeholder="XXX-XXX-XXX YY"
+               value="{{ patient.snils if patient }}">
+        <div class="form-hint">⚠ Дефект ТЗ: формат не валидируется</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary">
+          {{ 'Сохранить изменения' if patient else 'Зарегистрировать' }}
+        </button>
+        <a href="{{ url_for('patients.index') }}" class="btn btn-ghost">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

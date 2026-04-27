@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Записи на приём — МедДок{% endblock %}
+{% block page_title %}Записи на приём{% endblock %}
+{% block topbar_actions %}
+  <a href="{{ url_for('appointments.new') }}" class="btn btn-primary">➕ Новая запись</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Пациент</th><th>Врач</th><th>Дата и время</th></tr>
+      </thead>
+      <tbody>
+      {% for a in appointments %}
+        <tr>
+          <td>
+            <a href="{{ url_for('patients.emk', fio=a.patient_fio) }}">
+              {{ a.patient_fio }}
+            </a>
+          </td>
+          <td>{{ a.doctor_name }}</td>
+          <td><span class="badge badge-blue">{{ a.slot }}</span></td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="3" style="text-align:center;color:var(--text-muted);padding:32px">
+            Нет записей
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

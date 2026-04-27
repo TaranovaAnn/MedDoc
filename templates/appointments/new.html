@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Новая запись — МедДок{% endblock %}
+{% block page_title %}Новая запись на приём{% endblock %}
+{% block topbar_actions %}
+  <a href="{{ url_for('appointments.index') }}" class="btn btn-ghost">← Назад</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:560px">
+  <div class="card-header">📋 Запись пациента к врачу</div>
+  <div class="card-body">
+    <form method="post">
+
+      <div class="form-group">
+        <label>Пациент <span style="color:var(--danger)">*</span></label>
+        <select name="patient_fio" required>
+          <option value="">— Выберите пациента —</option>
+          {% for p in patients %}
+          <option value="{{ p.fio }}">{{ p.fio }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Врач <span style="color:var(--danger)">*</span></label>
+        <select name="doctor_name" id="doctorSelect" required onchange="updateSlots()">
+          <option value="">— Выберите врача —</option>
+          {% for d in doctors %}
+          <option value="{{ d.name }}">{{ d.name }} ({{ d.speciality }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Свободный слот <span style="color:var(--danger)">*</span></label>
+        <select name="slot" id="slotSelect" required>
+          <option value="">— Сначала выберите врача —</option>
+        </select>
+        <div class="form-hint">⚠ Дефект ТЗ: слот не блокируется автоматически</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary">Записать</button>
+        <a href="{{ url_for('appointments.index') }}" class="btn btn-ghost">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const FREE_SLOTS = {{ free_slots | tojson }};
+
+function updateSlots() {
+  const doctor = document.getElementById("doctorSelect").value;
+  const slotSel = document.getElementById("slotSelect");
+  slotSel.innerHTML = "";
+  const slots = FREE_SLOTS[doctor] || [];
+  if (!slots.length) {
+    slotSel.innerHTML = '<option value="">Нет свободных слотов</option>';
+  } else {
+    slotSel.innerHTML = '<option value="">— Выберите слот —</option>';
+    slots.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s; opt.textContent = s;
+      slotSel.appendChild(opt);
+    });
+  }
+}
+</script>
+{% endblock %}

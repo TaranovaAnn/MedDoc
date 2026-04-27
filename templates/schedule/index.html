@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Расписание — МедДок{% endblock %}
+{% block page_title %}Расписание врачей{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start">
+
+  <!-- Расписание -->
+  <div class="schedule-grid">
+    {% for d in doctors %}
+    <div class="doctor-card">
+      <div class="doctor-card-header">
+        👨‍⚕️ {{ d.name }}
+        <span class="badge badge-gray">{{ d.speciality }}</span>
+      </div>
+      <div class="slots">
+        {% for slot in d.schedule %}
+          {% if (d.name, slot) in booked %}
+            <span class="slot slot-busy">🔴 {{ slot }}</span>
+          {% else %}
+            <span class="slot slot-free">🟢 {{ slot }}</span>
+          {% endif %}
+        {% else %}
+          <span style="color:var(--text-muted);font-size:13px">Нет слотов</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+      <div class="card card-body" style="color:var(--text-muted)">Врачей нет</div>
+    {% endfor %}
+  </div>
+
+  <!-- Боковые формы -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <div class="card">
+      <div class="card-header">➕ Добавить врача</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('schedule.add_doctor') }}">
+          <div class="form-group">
+            <label>ФИО врача</label>
+            <input name="name" placeholder="Иванов И.И." required>
+          </div>
+          <div class="form-group">
+            <label>Специальность</label>
+            <input name="speciality" placeholder="Терапевт" required>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center">
+            Добавить врача
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">📅 Добавить слот</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('schedule.add_slot') }}">
+          <div class="form-group">
+            <label>Врач</label>
+            <select name="doctor" required>
+              <option value="">— Выберите —</option>
+              {% for d in doctors %}
+              <option>{{ d.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Дата и время</label>
+            <input name="slot" placeholder="2025-12-10 09:00" required>
+            <div class="form-hint">⚠ Дефект ТЗ: формат и выходные не проверяются</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center">
+            Добавить слот
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
